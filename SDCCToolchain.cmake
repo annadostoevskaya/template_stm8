@@ -1,0 +1,15 @@
+# TODO(annad): Research this part!!!
+# https://github.com/eduardoaugustojulio/8051.git
+
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_VERSION 1)
+set(CMAKE_SYSTEM_PROCESSOR stm8)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_C_COMPILER sdcc)
+
+set(CMAKE_FIND_ROOT_PATH /usr/share/sdcc)
+
+set(CMAKE_FIND_ROOT_PATH NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
