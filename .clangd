@@ -1,0 +1,3 @@
+CompileFlags:
+  Remove: [-m*, --out-fmt-ihx]
+  Compiler: sdcc

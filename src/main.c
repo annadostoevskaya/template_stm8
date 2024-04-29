@@ -2,7 +2,7 @@
  * Author: @github.com/annadostoevskaya
  * Filename: main.c
  * Created: 29 Apr 2024 04:08:08 PM
- * Last Update: 30 Apr 2024 12:26:00 AM
+ * Last Update: 30 Apr 2024 12:38:28 AM
  *
  * Description: <EMPTY>
  */
