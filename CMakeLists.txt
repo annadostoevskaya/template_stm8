@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_TOOLCHAIN_FILE "SDCCToolchain.cmake")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_TOOLCHAIN_FILE SDCC.toolchain.cmake)
 
 project(blinky C)
-
-set(CMAKE_EXPORT_COMPILER_COMMANDS ON)
 
 include_directories("./src")
 file(GLOB SRC "./src/*.c")
 
-set(CMAKE_C_FLAGS "-lstm8 -mstm8 --out-fmt-ihx --std=c99")
+set(CMAKE_C_FLAGS "-mstm8 --out-fmt-ihx --std=c99 --verbose")
 
 add_executable(${PROJECT_NAME} ${SRC})
 
