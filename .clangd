@@ -1,3 +1,4 @@
 CompileFlags:
   Remove: [-m*, --out-fmt-ihx]
+  Add: [--target=arm]
   Compiler: sdcc

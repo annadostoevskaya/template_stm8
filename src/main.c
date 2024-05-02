@@ -2,12 +2,13 @@
  * Author: @github.com/annadostoevskaya
  * Filename: main.c
  * Created: 29 Apr 2024 04:08:08 PM
- * Last Update: 01 May 2024 1:07:32 AM
+ * Last Update: 02 May 2024 2:28:07 AM
  *
  * Description: <EMPTY>
  */
 
 #include <stdint.h>
+#include <stdio.h>
 
 #ifdef __SDCC_stm8
 #define _SFR_(addr) (*(volatile uint8_t *)(0x5000 + (addr)))
@@ -20,14 +21,68 @@
 /* CLOCK */
 #define CLK_CKDIVR _SFR_(0xC6)
 
+/* UART1 */
+#define UART_SR   _SFR_(0x230)
+#define UART_TXE  7
+#define UART_TC   6
+#define UART_RXNE 5
+
+#define UART_DR   _SFR_(0x231)
+#define UART_BRR1 _SFR_(0x232)
+#define UART_BRR2 _SFR_(0x233)
+
+#define UART_CR1 _SFR_(0x234)
+
+#define UART_CR2 _SFR_(0x235)
+#define UART_TEN 3
+#define UART_REN 2
+
+#define UART_CR3 _SFR_(0x236)
+#define UART_CR4 _SFR_(0x237)
+#define UART_CR5 _SFR_(0x238)
+
+#define UART_GTR  _SFR_(0x239)
+#define UART_PSCR _SFR_(0x23A)
+
 #endif
 
 #define P_LED 4
 
+/* stm8s/delay.h */
 static inline void delay_ms(uint16_t ms) {
   for (uint32_t i = 0; i < ((F_CPU / 18000UL) * ms); i += 1) {
     __asm__("nop");
   }
+}
+
+/* stm8s/uart.h */
+void uart_init() {
+  UART_BRR2 = 0x00;
+  UART_BRR1 = 0x0D;
+  UART_CR2 = (1 << UART_TEN) | (1 << UART_REN);
+}
+
+void uart_write(uint8_t data) {
+  UART_DR = data;
+  while (!(UART_SR & (1 << UART_TC)))
+    ;
+}
+
+uint8_t uart_read() {
+  while (!(UART_SR & (1 << UART_RXNE))) {
+    PD_ODR ^= (1 << P_LED);
+    delay_ms(200);
+  }
+
+  for (;;)
+    ;
+
+  return UART_DR;
+}
+
+int putchar(int c) {
+  uart_write(c);
+  return 0;
 }
 
 int main() {
@@ -37,10 +92,8 @@ int main() {
   PD_DDR |= (1 << P_LED);
   PD_CR1 |= (1 << P_LED);
 
-  while (1) {
-    /* toggle pin every 250ms */
-    PD_ODR ^= (1 << P_LED);
-    delay_ms(1000);
+  if (uart_read() == 'e') {
+    PD_ODR |= (1 << P_LED);
   }
 
   return 0;
