@@ -2,7 +2,7 @@
  * Author: @github.com/annadostoevskaya
  * Filename: main.c
  * Created: 29 Apr 2024 04:08:08 PM
- * Last Update: 02 May 2024 2:28:07 AM
+ * Last Update: 02 May 2024 10:08:27 PM
  *
  * Description: <EMPTY>
  */
@@ -69,14 +69,8 @@ void uart_write(uint8_t data) {
 }
 
 uint8_t uart_read() {
-  while (!(UART_SR & (1 << UART_RXNE))) {
-    PD_ODR ^= (1 << P_LED);
-    delay_ms(200);
-  }
-
-  for (;;)
+  while (!(UART_SR & (1 << UART_RXNE)))
     ;
-
   return UART_DR;
 }
 
@@ -86,15 +80,31 @@ int putchar(int c) {
 }
 
 int main() {
-  // NOTE(annad): Disable prescale for High-Speed-Internal RC
-  // CLK_CKDIVR &= ~(0x18);
+  uart_init();
 
   PD_DDR |= (1 << P_LED);
   PD_CR1 |= (1 << P_LED);
 
-  if (uart_read() == 'e') {
-    PD_ODR |= (1 << P_LED);
+  delay_ms(2000);
+  for (;;) {
+    printf("\nroot@stm8]$ ");
+
+    uint8_t cmd = uart_read();
+    if (cmd == 'L') {
+      PD_ODR ^= (1 << P_LED);
+    }
   }
+  //
+  // uart_init();
+  //
+  // for (;;) {
+  //   uint8_t ch = uart_read();
+  //   if (ch == 'e') {
+  //
+  //   }
+  //
+  //   uart_write(ch);
+  // }
 
   return 0;
 }
