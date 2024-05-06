@@ -2,10 +2,15 @@
  * Author: @github.com/annadostoevskaya
  * Filename: main.c
  * Created: 29 Apr 2024 04:08:08 PM
- * Last Update: 06 May 2024 6:59:58 AM
+ * Last Update: 06 May 2024 11:39:45 AM
  *
  * Description: <EMPTY>
  */
+
+#ifdef __clang_analyzer__
+#define __interrupt(...)
+#define __naked(...)
+#endif
 
 #include <stdint.h>
 #include <stdio.h>
@@ -45,9 +50,19 @@
 #define UART_GTR  _SFR_(0x239)
 #define UART_PSCR _SFR_(0x23A)
 
-#endif
+/* TIM4 */
+#define TIM4_CR1     _SFR_(0x340)
+#define TIM4_CR1_CEN 0
+#define TIM4_IER     _SFR_(0x343)
+#define TIM4_IER_UIE 0
+#define TIM4_SR      _SFR_(0x344)
+#define TIM4_UIF     0
+#define TIM4_PSCR    _SFR_(0x347)
+#define TIM4_ARR     _SFR_(0x348)
 
-#define P_LED 4
+#define TIM4_ISR 23
+
+#endif
 
 /* stm8s/delay.h */
 static inline void delay_ms(uint16_t ms) {
@@ -80,20 +95,36 @@ int putchar(int c) {
   return 0;
 }
 
+#define P_LED 0x04
+
+void timer_isr(void) __interrupt(TIM4_ISR) {
+  PD_ODR ^= (1 << P_LED);
+  TIM4_SR &= ~(1 << TIM4_UIF);
+}
+
+extern uint8_t *_interrupt_vect;
+extern void *_sdcc_program_startup;
+
 int main() {
-  uart_init();
+  __asm__("rim");
 
   PD_DDR |= (1 << P_LED);
   PD_CR1 |= (1 << P_LED);
 
-  delay_ms(2000);
+  TIM4_PSCR |= 0x07;
 
-  printf("Hello, World!\n");
+  TIM4_ARR = 77; // 10ms
+
+  TIM4_IER |= (1 << TIM4_IER_UIE);
+  TIM4_CR1 |= (1 << TIM4_CR1_CEN);
+
+  uart_init();
 
   for (;;) {
-    if (uart_read() == 'L') {
-      PD_ODR ^= (1 << P_LED);
-    }
+    printf("ivt: %p\n", _interrupt_vect);
+    printf("_sdcc_program_startup: %p\n", _sdcc_program_startup);
+    printf("sizeof pointer: %d\n", sizeof(_interrupt_vect));
+    delay_ms(5000);
   }
 
   return 0;
