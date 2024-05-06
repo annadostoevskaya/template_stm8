@@ -2,7 +2,7 @@
  * Author: @github.com/annadostoevskaya
  * Filename: main.c
  * Created: 29 Apr 2024 04:08:08 PM
- * Last Update: 02 May 2024 10:08:27 PM
+ * Last Update: 06 May 2024 6:59:58 AM
  *
  * Description: <EMPTY>
  */
@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #ifdef __SDCC_stm8
+/* stm8s/io.h */
 #define _SFR_(addr) (*(volatile uint8_t *)(0x5000 + (addr)))
 
 /* PORT D */
@@ -86,25 +87,14 @@ int main() {
   PD_CR1 |= (1 << P_LED);
 
   delay_ms(2000);
-  for (;;) {
-    printf("\nroot@stm8]$ ");
 
-    uint8_t cmd = uart_read();
-    if (cmd == 'L') {
+  printf("Hello, World!\n");
+
+  for (;;) {
+    if (uart_read() == 'L') {
       PD_ODR ^= (1 << P_LED);
     }
   }
-  //
-  // uart_init();
-  //
-  // for (;;) {
-  //   uint8_t ch = uart_read();
-  //   if (ch == 'e') {
-  //
-  //   }
-  //
-  //   uart_write(ch);
-  // }
 
   return 0;
 }
